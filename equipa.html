@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Nossa Equipa | AB Informática Solutions</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003366'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' fill='%23f37021' font-size='14' font-family='Arial' font-weight='bold'%3EAB%3C/text%3E%3C/svg%3E">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --azul-escuro: #003366;
+            --azul-claro: #0066cc;
+            --laranja: #f37021;
+            --cinza-fundo: #f0f4f8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cinza-fundo);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        header {
+            background-color: #ffffff;
+            padding: 0 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo img {
+            height: 65px;
+            width: auto;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--azul-escuro);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background-color: var(--azul-claro);
+            transform: translateY(-1px);
+        }
+
+        /* HERO DA PÁGINA */
+        .page-hero {
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, #004d99 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 60px 8% 50px;
+        }
+
+        .page-hero h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .page-hero h1 span {
+            color: var(--laranja);
+        }
+
+        .page-hero p {
+            font-size: 16px;
+            color: #94a3b8;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .page-hero::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 4px;
+            background-color: var(--laranja);
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        main {
+            padding: 60px 8% 80px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ORGANOGRAMA */
+        .org-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        /* NÍVEL */
+        .level {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            position: relative;
+            width: 100%;
+        }
+
+        /* LINHA VERTICAL */
+        .connector-v {
+            width: 2px;
+            height: 40px;
+            background-color: #cbd5e1;
+            margin: 0 auto;
+        }
+
+        /* LINHA HORIZONTAL com filhos */
+        .connector-h-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .connector-h-line {
+            width: 60%;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+        }
+
+        .connector-h-line::before,
+        .connector-h-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 30px;
+            background-color: #cbd5e1;
+        }
+
+        .connector-h-line::before { left: 0; }
+        .connector-h-line::after  { right: 0; }
+
+        /* Linha H para 3 filhos */
+        .connector-3 {
+            width: 70%;
+        }
+
+        /* CARD */
+        .person-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            padding: 20px 24px;
+            text-align: center;
+            width: 180px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--azul-claro);
+            cursor: default;
+            position: relative;
+        }
+
+        .person-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,51,102,0.12);
+        }
+
+        .person-card.diretor-geral {
+            border-top-color: var(--laranja);
+            width: 200px;
+        }
+
+        .person-card.diretor-executivo {
+            border-top-color: var(--azul-escuro);
+            width: 200px;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 auto 12px;
+            color: #ffffff;
+        }
+
+        .avatar.laranja  { background-color: var(--laranja); }
+        .avatar.azul     { background-color: var(--azul-escuro); }
+        .avatar.azul-cl  { background-color: var(--azul-claro); }
+        .avatar.cinza    { background-color: #94a3b8; }
+
+        .person-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .person-card .cargo {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--laranja);
+            letter-spacing: 0.5px;
+        }
+
+        .person-card.vaga .avatar {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+            font-size: 22px;
+        }
+
+        .person-card.vaga h3 {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .badge-vaga {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background-color: #fef3c7;
+            color: #92400e;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* SECÇÃO GRID DE EQUIPA */
+        .team-section-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin: 70px 0 10px;
+        }
+
+        .team-section-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 4px;
+            background-color: var(--laranja);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .team-subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 40px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .team-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 28px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--azul-claro);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 28px rgba(0,51,102,0.1);
+        }
+
+        .team-card .avatar {
+            width: 64px;
+            height: 64px;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+
+        .team-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--azul-escuro);
+            margin-bottom: 5px;
+        }
+
+        .team-card .cargo {
+            font-size: 13px;
+            color: var(--laranja);
+            font-weight: 600;
+        }
+
+        .team-card.vaga .avatar {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .team-card.vaga h3 {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* RODAPÉ */
+        footer {
+            background-color: var(--azul-escuro);
+            color: #94a3b8;
+            text-align: center;
+            padding: 25px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--laranja);
+            text-decoration: none;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 700px) {
+            .page-hero h1 { font-size: 26px; }
+            main { padding: 40px 5% 60px; }
+
+            .person-card { width: 140px; padding: 16px 12px; }
+            .person-card.diretor-geral,
+            .person-card.diretor-executivo { width: 150px; }
+            .person-card h3 { font-size: 13px; }
+
+            .connector-h-line { width: 80%; }
+            .connector-3 { width: 90%; }
+
+            .level { gap: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .level { flex-wrap: wrap; }
+            .connector-h-line,
+            .connector-3 { display: none; }
+            .connector-v { height: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="./imagens/Design_sem_nome-removebg-preview.png" alt="AB Informática Solutions">
+        </div>
+        <a href="index.html" class="back-btn">← Voltar ao Site</a>
+    </header>
+
+    <div class="page-hero">
+        <h1>A Nossa <span>Equipa</span></h1>
+        <p>As pessoas que tornam tudo possível — com competência, dedicação e paixão pela tecnologia.</p>
+    </div>
+
+    <main>
+
+        <!-- ORGANOGRAMA -->
+        <p class="org-title">Organograma Actual</p>
+
+        <div class="org-chart">
+
+            <!-- NÍVEL 1: Diretor Geral -->
+            <div class="level">
+                <div class="person-card diretor-geral">
+                    <div class="avatar laranja">BA</div>
+                    <h3>Belmiro António</h3>
+                    <p class="cargo">Diretor Geral</p>
+                </div>
+            </div>
+
+            <div class="connector-v"></div>
+
+            <!-- NÍVEL 2: Diretor Executivo -->
+            <div class="level">
+                <div class="person-card diretor-executivo">
+                    <div class="avatar azul">JT</div>
+                    <h3>José Tchindandi</h3>
+                    <p class="cargo">Diretor Executivo</p>
+                </div>
+            </div>
+
+            <div class="connector-v"></div>
+
+            <!-- Linha horizontal para 3 filhos -->
+            <div class="connector-h-wrap">
+                <div class="connector-h-line connector-3"></div>
+            </div>
+
+            <div class="connector-v" style="height: 0;"></div>
+
+            <!-- NÍVEL 3: 3 directores -->
+            <div class="level" style="align-items: flex-start; margin-top: 0;">
+
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+                    <div class="connector-v"></div>
+                    <div class="person-card">
+                        <div class="avatar azul-cl">ND</div>
+                        <h3>Nelito Domingos</h3>
+                        <p class="cargo">Diretor Técnico</p>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+                    <div class="connector-v"></div>
+                    <div class="person-card">
+                        <div class="avatar azul-cl">DJ</div>
+                        <h3>Daniel José</h3>
+                        <p class="cargo">Diretor Comercial</p>
+                    </div>
+                    <!-- Sub-nível: Secretário + Recepcionista vagos -->
+                    <div class="connector-v"></div>
+                    <div class="person-card vaga">
+                        <span class="badge-vaga">VAGA</span>
+                        <div class="avatar">👤</div>
+                        <h3>A preencher</h3>
+                        <p class="cargo">Secretário Executivo</p>
+                    </div>
+                    <div class="connector-v"></div>
+                    <div class="person-card vaga">
+                        <span class="badge-vaga">VAGA</span>
+                        <div class="avatar">👤</div>
+                        <h3>A preencher</h3>
+                        <p class="cargo">Recepcionista</p>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+                    <div class="connector-v"></div>
+                    <div class="person-card">
+                        <div class="avatar azul-cl">WC</div>
+                        <h3>Wilson Cawina</h3>
+                        <p class="cargo">Diretor Administrativo</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- GRID DA EQUIPA -->
+        <h2 class="team-section-title">Conheça a Equipa</h2>
+        <p class="team-subtitle">Profissionais comprometidos com a excelência tecnológica.</p>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="avatar laranja">BA</div>
+                <h3>Belmiro António</h3>
+                <p class="cargo">Diretor Geral</p>
+            </div>
+            <div class="team-card">
+                <div class="avatar azul">JT</div>
+                <h3>José Tchindandi</h3>
+                <p class="cargo">Diretor Executivo</p>
+            </div>
+            <div class="team-card">
+                <div class="avatar azul-cl">ND</div>
+                <h3>Nelito Domingos</h3>
+                <p class="cargo">Diretor Técnico</p>
+            </div>
+            <div class="team-card">
+                <div class="avatar azul-cl">DJ</div>
+                <h3>Daniel José</h3>
+                <p class="cargo">Diretor Comercial</p>
+            </div>
+            <div class="team-card">
+                <div class="avatar azul-cl">WC</div>
+                <h3>Wilson Cawina</h3>
+                <p class="cargo">Diretor Administrativo</p>
+            </div>
+            <div class="team-card vaga">
+                <div class="avatar cinza">?</div>
+                <h3>Vaga em aberto</h3>
+                <p class="cargo">Secretário Executivo</p>
+            </div>
+            <div class="team-card vaga">
+                <div class="avatar cinza">?</div>
+                <h3>Vaga em aberto</h3>
+                <p class="cargo">Recepcionista</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 AB Informática Solutions &nbsp;|&nbsp; <a href="index.html">Voltar ao site principal</a></p>
+    </footer>
+
+</body>
+</html>
