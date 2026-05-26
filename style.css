@@ -663,19 +663,19 @@ footer {
 
 .footer-social {
     display: flex;
-    gap: 14px;
+    gap: 15px;
 }
 
 .footer-social a {
-    font-size: 20px;
-    text-decoration: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    opacity: 0.7;
+    color: #94a3b8; /* Cor original do rodapé */
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .footer-social a:hover {
+    color: var(--laranja); /* Destaque ao passar o rato */
     transform: translateY(-3px);
-    opacity: 1;
 }
 
 /* =====================
