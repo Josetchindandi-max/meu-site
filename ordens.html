@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordens de Serviço | AB Informática Solutions</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003366'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' fill='%23f37021' font-size='14' font-family='Arial' font-weight='bold'%3EAB%3C/text%3E%3C/svg%3E">
+
+    <style>
+        body {
+            display: none;
+            background-color: var(--cinza-fundo);
+            padding-top: 30px;
+            padding-bottom: 60px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        :root {
+            --azul-escuro: #003366;
+            --azul-claro: #0066cc;
+            --laranja: #f37021;
+            --cinza-fundo: #f8fafc;
+            --texto-escuro: #1e293b;
+        }
+
+        .os-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HEADER DO PAINEL */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 18px 28px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .dash-header-left { display: flex; align-items: center; gap: 14px; }
+        .back-link {
+            color: var(--azul-claro);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            border: 1.5px solid var(--azul-claro);
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .back-link:hover { background: var(--azul-claro); color: #fff; }
+        .dash-header h1 { font-size: 22px; color: var(--azul-escuro); margin: 0; }
+        .dash-header p  { font-size: 13px; color: #64748b; margin: 2px 0 0; }
+        .user-info { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .logout-btn {
+            background: #ef4444; color: #fff; border: none;
+            padding: 7px 14px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 13px; transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #dc2626; }
+
+        /* ESTATÍSTICAS DO TOPO */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border-left: 4px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-box.pendente  { border-left-color: #f59e0b; }
+        .stat-box.em-curso  { border-left-color: #3b82f6; }
+        .stat-box.concluido { border-left-color: #22c55e; }
+        .stat-box.total     { border-left-color: var(--laranja); }
+        .stat-box span { font-size: 28px; font-weight: 700; color: var(--azul-escuro); }
+        .stat-box p    { font-size: 13px; color: #64748b; margin: 0; }
+
+        /* BARRA DE AÇÕES */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .filter-btn.active, .filter-btn:hover { border-color: var(--azul-claro); color: var(--azul-claro); background: #eff6ff; }
+        .filter-btn.active { background: var(--azul-claro); color: #fff; }
+
+        .search-input {
+            padding: 8px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            width: 220px;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--azul-claro); }
+
+        .btn-nova-os {
+            background: var(--laranja);
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-nova-os:hover { background: #e05d0e; transform: translateY(-1px); }
+
+        /* TABELA DE O.S. */
+        .os-table-wrap {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background: var(--azul-escuro);
+            color: #fff;
+            padding: 13px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s;
+        }
+        tbody tr:hover { background: #f8fafc; }
+        tbody td { padding: 13px 16px; color: var(--texto-escuro); vertical-align: middle; }
+
+        /* BADGES DE ESTADO */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-pendente  { background: #fef3c7; color: #92400e; }
+        .badge-em-curso  { background: #dbeafe; color: #1e40af; }
+        .badge-concluido { background: #dcfce7; color: #166534; }
+        .badge-cancelado { background: #fee2e2; color: #991b1b; }
+
+        /* PRIORIDADE */
+        .prioridade {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .prioridade::before { content: '●'; font-size: 10px; }
+        .prioridade.alta   { color: #ef4444; }
+        .prioridade.media  { color: #f59e0b; }
+        .prioridade.baixa  { color: #22c55e; }
+
+        /* BOTÕES DE AÇÃO DA LINHA */
+        .row-actions { display: flex; gap: 6px; }
+        .btn-editar, .btn-eliminar, .btn-ver {
+            border: none;
+            border-radius: 6px;
+            padding: 5px 11px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-ver     { background: #e0f2fe; color: #0369a1; }
+        .btn-editar  { background: #fef3c7; color: #92400e; }
+        .btn-eliminar{ background: #fee2e2; color: #991b1b; }
+        .btn-ver:hover, .btn-editar:hover, .btn-eliminar:hover { opacity: 0.75; }
+
+        /* ESTADO VAZIO */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state p { font-size: 16px; margin-top: 8px; }
+
+        /* LOADING */
+        .loading-row td { text-align: center; padding: 40px; color: #64748b; }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .modal-header h2 { font-size: 20px; color: var(--azul-escuro); margin: 0; }
+        .modal-close {
+            background: none; border: none; font-size: 22px;
+            cursor: pointer; color: #94a3b8; line-height: 1;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: #ef4444; }
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* FORMULÁRIO DO MODAL */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 7px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { border-color: var(--azul-claro); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .btn-cancelar {
+            padding: 9px 20px; border: 1.5px solid #e2e8f0;
+            background: #fff; border-radius: 7px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            color: #64748b; transition: all 0.2s;
+        }
+        .btn-cancelar:hover { background: #f1f5f9; }
+        .btn-guardar {
+            padding: 9px 24px; background: var(--azul-escuro);
+            color: #fff; border: none; border-radius: 7px;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-guardar:hover { background: var(--azul-claro); transform: translateY(-1px); }
+        .btn-guardar:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+
+        /* MODAL DE DETALHES */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .detail-item { display: flex; flex-direction: column; gap: 3px; }
+        .detail-item label { font-size: 12px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-item span  { font-size: 15px; color: var(--texto-escuro); font-weight: 500; }
+        .detail-item.full  { grid-column: 1 / -1; }
+        .detail-divider { grid-column: 1 / -1; border: none; border-top: 1px solid #e2e8f0; margin: 4px 0; }
+
+        /* MODAL DE CONFIRMAÇÃO DE ELIMINAÇÃO */
+        .confirm-modal-body { text-align: center; padding: 30px 24px; }
+        .confirm-modal-body p { font-size: 16px; color: #475569; margin-top: 8px; }
+        .btn-confirmar-del {
+            padding: 9px 20px; background: #ef4444;
+            color: #fff; border: none; border-radius: 7px;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-confirmar-del:hover { background: #dc2626; }
+
+        /* TOAST NOTIFICAÇÃO */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--azul-escuro);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 99999;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.sucesso { background: #16a34a; }
+        .toast.erro    { background: #dc2626; }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .detail-grid { grid-template-columns: 1fr; }
+            table { font-size: 12px; }
+            thead th, tbody td { padding: 10px 10px; }
+            .actions-bar { flex-direction: column; align-items: stretch; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="os-container">
+
+    <div class="dash-header">
+        <div class="dash-header-left">
+            <a href="dashboard.html" class="back-link">← Painel</a>
+            <div>
+                <h1>Ordens de Serviço</h1>
+                <p>Gestão completa de O.S. da AB Informática Solutions</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <span>👤 <strong id="user-email">A carregar...</strong></span>
+            <button class="logout-btn" id="btn-logout">Sair</button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-box total">
+            <span id="stat-total">0</span>
+            <p>Total de O.S.</p>
+        </div>
+        <div class="stat-box pendente">
+            <span id="stat-pendente">0</span>
+            <p>Pendentes</p>
+        </div>
+        <div class="stat-box em-curso">
+            <span id="stat-em-curso">0</span>
+            <p>Em Curso</p>
+        </div>
+        <div class="stat-box concluido">
+            <span id="stat-concluido">0</span>
+            <p>Concluídas</p>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <div class="filters" id="filtros">
+                <button class="filter-btn active" data-filtro="todos">Todas</button>
+                <button class="filter-btn" data-filtro="Pendente">Pendentes</button>
+                <button class="filter-btn" data-filtro="Em Curso">Em Curso</button>
+                <button class="filter-btn" data-filtro="Concluído">Concluídas</button>
+                <button class="filter-btn" data-filtro="Cancelado">Canceladas</button>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="🔍 Pesquisar cliente ou técnico...">
+        </div>
+        <button class="btn-nova-os" id="btn-nova-os">+ Nova O.S.</button>
+    </div>
+
+    <div class="os-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Tipo de Serviço</th>
+                    <th>Técnico</th>
+                    <th>Prioridade</th>
+                    <th>Estado</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="os-tbody">
+                <tr class="loading-row"><td colspan="8">A carregar ordens de serviço...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="modal-os">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modal-titulo">Nova Ordem de Serviço</h2>
+            <button class="modal-close" id="fechar-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nome do Cliente *</label>
+                    <input type="text" id="f-cliente" placeholder="Ex: João Silva" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone do Cliente</label>
+                    <input type="tel" id="f-telefone" placeholder="Ex: 9XX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Serviço *</label>
+                    <select id="f-tipo">
+                        <option value="">-- Selecionar --</option>
+                        <option>Manutenção de Computador</option>
+                        <option>Instalação de Rede</option>
+                        <option>CCTV - Videovigilância</option>
+                        <option>Configuração de Software</option>
+                        <option>Suporte Remoto</option>
+                        <option>Consultoria Tecnológica</option>
+                        <option>Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Técnico Responsável *</label>
+                    <select id="f-tecnico">
+                        <option value="">-- Selecionar --</option>
+                        <option>Nelito Domingos</option>
+                        <option>Daniel José</option>
+                        <option>Wilson Cawina</option>
+                        <option>Belmiro António</option>
+                        <option>José Tchindandi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="f-estado">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Curso">Em Curso</option>
+                        <option value="Concluído">Concluído</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prioridade</label>
+                    <select id="f-prioridade">
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                        <option value="baixa">Baixa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Localização / Morada</label>
+                    <input type="text" id="f-local" placeholder="Ex: Talatona, Luanda">
+                </div>
+                <div class="form-group">
+                    <label>Valor Estimado (Kz)</label>
+                    <input type="number" id="f-valor" placeholder="Ex: 15000" min="0">
+                </div>
+                <div class="form-group full">
+                    <label>Descrição do Problema / Trabalho *</label>
+                    <textarea id="f-descricao" placeholder="Descreva detalhadamente o problema ou o trabalho a realizar..."></textarea>
+                </div>
+                <div class="form-group full">
+                    <label>Observações Internas</label>
+                    <textarea id="f-obs" placeholder="Notas internas para a equipa (não visível ao cliente)..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancelar" id="cancelar-modal">Cancelar</button>
+            <button class="btn-guardar" id="guardar-os">💾 Guardar O.S.</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-detalhes">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Detalhes da Ordem de Serviço</h2>
+            <button class="modal-close" id="fechar-detalhes">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-grid" id="detail-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancelar" id="fechar-detalhes-2">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirmar">
+    <div class="modal" style="max-width: 420px;">
+        <div class="modal-header">
+            <h2>Confirmar Eliminação</h2>
+            <button class="modal-close" id="fechar-confirmar">✕</button>
+        </div>
+        <div class="confirm-modal-body">
+            <div style="font-size: 42px;">🗑️</div>
+            <p>Tens a certeza que queres eliminar esta O.S.? Esta ação é <strong>irreversível</strong>.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancelar" id="cancelar-eliminar">Cancelar</button>
+            <button class="btn-confirmar-del" id="confirmar-eliminar">Sim, Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script type="module">
+    import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import {
+        getFirestore, collection, addDoc, getDocs, doc,
+        updateDoc, deleteDoc, query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // FIREBASE CONFIG (ATUALIZADO)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWaRPM6MswWA7gDZiyInuAmAC333RWCrg",
+        authDomain: "ab-informatica-solutions.firebaseapp.com",
+        projectId: "ab-informatica-solutions",
+        storageBucket: "ab-informatica-solutions.firebasestorage.app",
+        messagingSenderId: "569361421220",
+        appId: "1:569361421220:web:1d940f77c3e0a446f0a731"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let todasOS       = [];
+    let filtroAtivo   = "todos";
+    let pesquisa      = "";
+    let editandoId    = null;
+    let eliminandoId  = null;
+
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            document.body.style.display = "block";
+            document.getElementById("user-email").textContent = user.email;
+            carregarOS();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", () => {
+        signOut(auth).then(() => window.location.href = "login.html");
+    });
+
+    async function carregarOS() {
+        const tbody = document.getElementById("os-tbody");
+        tbody.innerHTML = `<tr class="loading-row"><td colspan="8">A carregar...</td></tr>`;
+        try {
+            const q = query(collection(db, "ordens_servico"), orderBy("criadoEm", "desc"));
+            const snap = await getDocs(q);
+            todasOS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            atualizarEstatisticas();
+            renderizarTabela();
+        } catch(e) {
+            tbody.innerHTML = `<tr class="loading-row"><td colspan="8" style="color:#ef4444;">Erro ao carregar. Verifica as regras do Firestore.</td></tr>`;
+        }
+    }
+
+    function atualizarEstatisticas() {
+        document.getElementById("stat-total").textContent    = todasOS.length;
+        document.getElementById("stat-pendente").textContent = todasOS.filter(o => o.estado === "Pendente").length;
+        document.getElementById("stat-em-curso").textContent = todasOS.filter(o => o.estado === "Em Curso").length;
+        document.getElementById("stat-concluido").textContent= todasOS.filter(o => o.estado === "Concluído").length;
+    }
+
+    function renderizarTabela() {
+        const tbody = document.getElementById("os-tbody");
+        let lista = todasOS;
+
+        if (filtroAtivo !== "todos") lista = lista.filter(o => o.estado === filtroAtivo);
+        if (pesquisa.trim()) {
+            const p = pesquisa.toLowerCase();
+            lista = lista.filter(o =>
+                (o.cliente  || "").toLowerCase().includes(p) ||
+                (o.tecnico  || "").toLowerCase().includes(p) ||
+                (o.tipo     || "").toLowerCase().includes(p)
+            );
+        }
+
+        if (lista.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="8">
+                    <div class="empty-state">
+                        <div style="font-size:40px;">📋</div>
+                        <p>Nenhuma ordem de serviço encontrada.</p>
+                    </div>
+                </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = lista.map((os, i) => {
+            const badgeClass = {
+                "Pendente": "badge-pendente",
+                "Em Curso": "badge-em-curso",
+                "Concluído": "badge-concluido",
+                "Cancelado": "badge-cancelado"
+            }[os.estado] || "badge-pendente";
+
+            const data = os.criadoEm?.toDate
+                ? os.criadoEm.toDate().toLocaleDateString("pt-AO", { day:"2-digit", month:"2-digit", year:"numeric" })
+                : "—";
+
+            return `
+            <tr>
+                <td style="font-weight:700; color:#94a3b8;">#${String(i+1).padStart(3,"0")}</td>
+                <td>
+                    <div style="font-weight:600;">${os.cliente || "—"}</div>
+                    <div style="font-size:12px; color:#94a3b8;">${os.telefone || ""}</div>
+                </td>
+                <td>${os.tipo || "—"}</td>
+                <td>${os.tecnico || "—"}</td>
+                <td><span class="prioridade ${os.prioridade || 'media'}">${(os.prioridade||"media").charAt(0).toUpperCase()+(os.prioridade||"media").slice(1)}</span></td>
+                <td><span class="badge ${badgeClass}">${os.estado || "Pendente"}</span></td>
+                <td style="font-size:13px; color:#64748b;">${data}</td>
+                <td>
+                    <div class="row-actions">
+                        <button class="btn-ver"      onclick="verOS('${os.id}')">👁 Ver</button>
+                        <button class="btn-editar"   onclick="editarOS('${os.id}')">✏️ Editar</button>
+                        <button class="btn-eliminar" onclick="pedirEliminar('${os.id}')">🗑</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join("");
+    }
+
+    document.getElementById("filtros").addEventListener("click", e => {
+        if (!e.target.classList.contains("filter-btn")) return;
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
+        filtroAtivo = e.target.dataset.filtro;
+        renderizarTabela();
+    });
+
+    document.getElementById("search-input").addEventListener("input", e => {
+        pesquisa = e.target.value;
+        renderizarTabela();
+    });
+
+    function abrirModal() { document.getElementById("modal-os").classList.add("open"); }
+    function fecharModal() {
+        document.getElementById("modal-os").classList.remove("open");
+        limparFormulario();
+        editandoId = null;
+    }
+
+    document.getElementById("btn-nova-os").addEventListener("click", () => {
+        editandoId = null;
+        document.getElementById("modal-titulo").textContent = "Nova Ordem de Serviço";
+        abrirModal();
+    });
+    document.getElementById("fechar-modal").addEventListener("click", fecharModal);
+    document.getElementById("cancelar-modal").addEventListener("click", fecharModal);
+
+    function limparFormulario() {
+        ["f-cliente","f-telefone","f-local","f-valor","f-descricao","f-obs"]
+            .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
+        document.getElementById("f-tipo").value       = "";
+        document.getElementById("f-tecnico").value    = "";
+        document.getElementById("f-estado").value     = "Pendente";
+        document.getElementById("f-prioridade").value = "media";
+    }
+
+    document.getElementById("guardar-os").addEventListener("click", async () => {
+        const cliente   = document.getElementById("f-cliente").value.trim();
+        const tipo      = document.getElementById("f-tipo").value;
+        const tecnico   = document.getElementById("f-tecnico").value;
+        const descricao = document.getElementById("f-descricao").value.trim();
+
+        if (!cliente || !tipo || !tecnico || !descricao) {
+            mostrarToast("Preenche os campos obrigatórios (*).", "erro");
+            return;
+        }
+
+        const btn = document.getElementById("guardar-os");
+        btn.disabled = true;
+        btn.textContent = "A guardar...";
+
+        const dados = {
+            cliente,
+            telefone:   document.getElementById("f-telefone").value.trim(),
+            tipo,
+            tecnico,
+            estado:     document.getElementById("f-estado").value,
+            prioridade: document.getElementById("f-prioridade").value,
+            local:      document.getElementById("f-local").value.trim(),
+            valor:      parseFloat(document.getElementById("f-valor").value) || 0,
+            descricao,
+            obs:        document.getElementById("f-obs").value.trim(),
+        };
+
+        try {
+            if (editandoId) {
+                await updateDoc(doc(db, "ordens_servico", editandoId), { ...dados, atualizadoEm: serverTimestamp() });
+                mostrarToast("O.S. atualizada com sucesso!", "sucesso");
+            } else {
+                dados.criadoEm = serverTimestamp();
+                await addDoc(collection(db, "ordens_servico"), dados);
+                mostrarToast("Nova O.S. criada com sucesso!", "sucesso");
+            }
+            fecharModal();
+            carregarOS();
+        } catch(e) {
+            mostrarToast("Erro ao guardar. Tenta novamente.", "erro");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "💾 Guardar O.S.";
+        }
+    });
+
+    window.verOS = function(id) {
+        const os = todasOS.find(o => o.id === id);
+        if (!os) return;
+        const data = os.criadoEm?.toDate
+            ? os.criadoEm.toDate().toLocaleString("pt-AO")
+            : "—";
+        const badgeClass = {
+            "Pendente":"badge-pendente","Em Curso":"badge-em-curso",
+            "Concluído":"badge-concluido","Cancelado":"badge-cancelado"
+        }[os.estado] || "badge-pendente";
+
+        document.getElementById("detail-content").innerHTML = `
+            <div class="detail-item"><label>Cliente</label><span>${os.cliente||"—"}</span></div>
+            <div class="detail-item"><label>Telefone</label><span>${os.telefone||"—"}</span></div>
+            <div class="detail-item"><label>Tipo de Serviço</label><span>${os.tipo||"—"}</span></div>
+            <div class="detail-item"><label>Técnico</label><span>${os.tecnico||"—"}</span></div>
+            <div class="detail-item"><label>Estado</label><span><span class="badge ${badgeClass}">${os.estado||"—"}</span></span></div>
+            <div class="detail-item"><label>Prioridade</label><span><span class="prioridade ${os.prioridade||'media'}">${(os.prioridade||"media").charAt(0).toUpperCase()+(os.prioridade||"media").slice(1)}</span></span></div>
+            <div class="detail-item"><label>Localização</label><span>${os.local||"—"}</span></div>
+            <div class="detail-item"><label>Valor Estimado</label><span>${os.valor ? os.valor.toLocaleString("pt-AO") + " Kz" : "—"}</span></div>
+            <hr class="detail-divider">
+            <div class="detail-item full"><label>Descrição do Problema</label><span style="white-space:pre-wrap; line-height:1.6;">${os.descricao||"—"}</span></div>
+            <div class="detail-item full"><label>Observações Internas</label><span style="white-space:pre-wrap; line-height:1.6; color:#64748b;">${os.obs||"Nenhuma"}</span></div>
+            <hr class="detail-divider">
+            <div class="detail-item"><label>Criado em</label><span>${data}</span></div>
+        `;
+        document.getElementById("modal-detalhes").classList.add("open");
+    };
+
+    document.getElementById("fechar-detalhes").addEventListener("click",   () => document.getElementById("modal-detalhes").classList.remove("open"));
+    document.getElementById("fechar-detalhes-2").addEventListener("click", () => document.getElementById("modal-detalhes").classList.remove("open"));
+
+    window.editarOS = function(id) {
+        const os = todasOS.find(o => o.id === id);
+        if (!os) return;
+        editandoId = id;
+        document.getElementById("modal-titulo").textContent = "Editar Ordem de Serviço";
+        document.getElementById("f-cliente").value    = os.cliente    || "";
+        document.getElementById("f-telefone").value   = os.telefone   || "";
+        document.getElementById("f-tipo").value       = os.tipo       || "";
+        document.getElementById("f-tecnico").value    = os.tecnico    || "";
+        document.getElementById("f-estado").value     = os.estado     || "Pendente";
+        document.getElementById("f-prioridade").value = os.prioridade || "media";
+        document.getElementById("f-local").value      = os.local      || "";
+        document.getElementById("f-valor").value      = os.valor      || "";
+        document.getElementById("f-descricao").value  = os.descricao  || "";
+        document.getElementById("f-obs").value        = os.obs        || "";
+        abrirModal();
+    };
+
+    window.pedirEliminar = function(id) {
+        eliminandoId = id;
+        document.getElementById("modal-confirmar").classList.add("open");
+    };
+
+    document.getElementById("fechar-confirmar").addEventListener("click",  () => document.getElementById("modal-confirmar").classList.remove("open"));
+    document.getElementById("cancelar-eliminar").addEventListener("click", () => document.getElementById("modal-confirmar").classList.remove("open"));
+
+    document.getElementById("confirmar-eliminar").addEventListener("click", async () => {
+        if (!eliminandoId) return;
+        try {
+            await deleteDoc(doc(db, "ordens_servico", eliminandoId));
+            mostrarToast("O.S. eliminada.", "sucesso");
+            document.getElementById("modal-confirmar").classList.remove("open");
+            carregarOS();
+        } catch(e) {
+            mostrarToast("Erro ao eliminar.", "erro");
+        }
+        eliminandoId = null;
+    });
+
+    ["modal-os","modal-detalhes","modal-confirmar"].forEach(id => {
+        document.getElementById(id).addEventListener("click", e => {
+            if (e.target.id === id) {
+                e.target.classList.remove("open");
+                if (id === "modal-os") { limparFormulario(); editandoId = null; }
+            }
+        });
+    });
+
+    function mostrarToast(msg, tipo = "sucesso") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = `toast ${tipo} show`;
+        setTimeout(() => t.classList.remove("show"), 3200);
+    }
+</script>
+</body>
+</html>
