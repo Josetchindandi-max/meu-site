@@ -894,3 +894,20 @@ footer {
         height: 48px;
     }
 }
+/* Botão da Área Restrita no Menu Principal */
+.btn-restrito {
+    background-color: var(--azul-escuro);
+    color: #ffffff !important; /* Força o texto a ficar branco */
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: 2px solid var(--azul-escuro);
+    transition: all 0.3s ease;
+}
+
+/* Efeito ao passar o rato por cima */
+.btn-restrito:hover {
+    background-color: var(--laranja);
+    border-color: var(--laranja);
+    color: #ffffff !important;
+}
