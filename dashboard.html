@@ -8,122 +8,134 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23003366'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' fill='%23f37021' font-size='14' font-family='Arial' font-weight='bold'%3EAB%3C/text%3E%3C/svg%3E">
     
     <style>
-        /* Bloqueia a visualização inicial por segurança até o Firebase confirmar o login */
-        body { 
-            display: none; 
-            background-color: var(--cinza-fundo); 
-            padding-top: 40px;
-        }
+        /* Bloqueia visualização inicial por segurança */
+        body { display: none; background-color: var(--cinza-fundo); margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .dash-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ffffff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        .dash-header h1 {
-            color: var(--azul-escuro);
-            font-size: 24px;
-        }
-        .dash-header p {
-            color: #64748b;
-            font-size: 14px;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .logout-btn:hover { 
-            background: #dc2626; 
-        }
+        .dash-layout { display: flex; min-height: 100vh; }
         
-        .dash-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .dash-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .dash-card h3 {
-            color: var(--azul-claro);
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--cinza-fundo);
-            padding-bottom: 10px;
-            font-size: 18px;
-        }
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
-        .stats span { 
-            font-weight: bold; 
-            color: var(--laranja); 
-        }
+        /* Menu Lateral (Sidebar) */
+        .sidebar { width: 260px; background-color: var(--azul-escuro); color: white; padding: 25px 15px; display: flex; flex-direction: column; gap: 30px; }
+        .sidebar .logo-area { text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        .sidebar h2 { font-size: 18px; color: var(--laranja); margin: 0; }
+        .menu-links { display: flex; flex-direction: column; gap: 10px; list-style: none; padding: 0; }
+        .menu-links li a { color: #cbd5e1; text-decoration: none; padding: 12px 15px; border-radius: 6px; display: block; font-weight: 500; cursor: pointer; transition: all 0.3s; }
+        .menu-links li a:hover, .menu-links li a.active { background-color: var(--azul-claro); color: white; }
+        
+        /* Área de Conteúdo Principal */
+        .main-content { flex: 1; padding: 40px; box-sizing: border-box; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .dash-header h1 { color: var(--azul-escuro); font-size: 24px; margin: 0; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        
+        /* Abas de Conteúdo */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Cards e Grelhas */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .dash-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .dash-card h3 { color: var(--azul-claro); margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; }
+        .stats span { font-weight: bold; color: var(--laranja); }
+        
+        /* Módulo IA de Diagnóstico */
+        .ia-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .search-box { display: flex; gap: 10px; margin-bottom: 25px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; }
+        .search-box button { background: var(--laranja); color: white; border: none; padding: 0 25px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .ia-response { background: #f8fafc; border-left: 4px solid var(--azul-claro); padding: 20px; border-radius: 0 6px 6px 0; display: none; }
+        
+        /* Módulo de Chat da Equipa */
+        .chat-container { background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 500px; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #f8fafc; }
+        .msg { max-width: 70%; padding: 12px; border-radius: 8px; font-size: 14px; }
+        .msg.received { background: #e2e8f0; align-self: flex-start; }
+        .msg.sent { background: var(--azul-escuro); color: white; align-self: flex-end; }
+        .msg .meta { font-size: 11px; opacity: 0.7; margin-bottom: 4px; display: block; font-weight: bold; }
+        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid #e2e8f0; gap: 10px; }
+        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .chat-input-area button { background: var(--azul-escuro); color: white; border: none; padding: 0 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <div class="dash-header">
-            <div>
-                <h1>Painel de Gestão Técnica</h1>
-                <p>Área restrita da AB Informática Solutions</p>
+    <div class="dash-layout">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h2>AB Solutions</h2>
+                <small style="color: #94a3b8;">Painel Interno</small>
             </div>
-            <div class="user-info">
-                <span>Utilizador: <strong id="user-email">A carregar...</strong></span>
-                <button class="logout-btn" id="btn-logout">Sair</button>
-            </div>
-        </div>
+            <ul class="menu-links">
+                <li><a onclick="switchTab('visao-geral')" id="link-visao-geral" class="active">Visão Geral</a></li>
+                <li><a onclick="switchTab('assistente-ia')" id="link-assistente-ia">IA de Resolução</a></li>
+                <li><a onclick="switchTab('chat-equipa')" id="link-chat-equipa">Chat da Equipa</a></li>
+            </ul>
+        </aside>
 
-        <div class="dash-grid">
-            <div class="dash-card">
-                <h3>Ordens de Serviço (O.S.)</h3>
-                <div class="stats"><p>Manutenções Pendentes:</p><span>5</span></div>
-                <div class="stats"><p>Redes em Curso:</p><span>2</span></div>
-                <div class="stats"><p>Concluídas este mês:</p><span>14</span></div>
+        <main class="main-content">
+            <div class="dash-header">
+                <div>
+                    <h1 id="tab-title">Painel de Gestão Técnica</h1>
+                    <p style="margin:5px 0 0 0; color:#64748b;" id="user-email">A carregar técnico...</p>
+                </div>
+                <button class="logout-btn" id="btn-logout">Sair do Painel</button>
             </div>
 
-            <div class="dash-card">
-                <h3>Pedidos de Contacto</h3>
-                <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">
-                    Mensagens enviadas através do site principal.
-                </p>
-                <div class="stats"><p>Novos Pedidos:</p><span style="color: green;">3 Novos</span></div>
+            <div id="visao-geral" class="tab-content active">
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <h3>Ordens de Serviço</h3>
+                        <div class="stats"><p>Manutenções Pendentes:</p><span>5</span></div>
+                        <div class="stats"><p>Redes em Curso:</p><span>2</span></div>
+                    </div>
+                    <div class="dash-card">
+                        <h3>Alertas de Sistema</h3>
+                        <p style="font-size: 14px; color: #64748b;">Nenhum problema crítico detetado na infraestrutura dos clientes neste momento.</p>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <div id="assistente-ia" class="tab-content">
+                <div class="ia-container">
+                    <h3>Assistente de Procedimentos & Diagnósticos</h3>
+                    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">Introduza palavras-chave como <strong>"rede"</strong>, <strong>"lento"</strong>, <strong>"impressora"</strong> ou <strong>"backup"</strong> para obter o diagnóstico detalhado e a resolução imediata.</p>
+                    
+                    <div class="search-box">
+                        <input type="text" id="ia-query" placeholder="Ex: Computador lento após atualização ou falha de rede...">
+                        <button onclick="consultarIA()">Analisar Problema</button>
+                    </div>
+
+                    <div id="ia-response" class="ia-response">
+                        </div>
+                </div>
+            </div>
+
+            <div id="chat-equipa" class="tab-content">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="msg received">
+                            <span class="meta">Nelito Domingos (Diretor Técnico)</span>
+                            Viva equipa, temos uma intervenção estruturada de rede agendada para amanhã às 09h no cliente X. Confirmem a disponibilidade.
+                        </div>
+                        <div class="msg received">
+                            <span class="meta">Daniel José</span>
+                            Recebido, Nelito. Já tenho o relatório técnico anterior impresso para levarmos.
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Escreva uma mensagem para a equipa da AB...">
+                        <button onclick="enviarMensagem()">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // ⚠️ COLA AQUI AS MESMAS CHAVES QUE METESTE NO TEU FICHEIRO AUTH.JS
+        // ⚠️ COLA AQUI AS TUAS CHAVES REAIS DO GOOGLE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAWaRPM6MswWA7gDZiyInuAmAC333RWCrg",
   authDomain: "ab-informatica-solutions.firebaseapp.com",
@@ -133,32 +145,108 @@
   appId: "1:569361421220:web:723f827a621b58faf0a731"
         };
 
-        // Inicializar
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
         const userEmailSpan = document.getElementById("user-email");
         const btnLogout = document.getElementById("btn-logout");
 
-        // Guarda-costas ativo: Verifica se o utilizador está mesmo logado
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Se estiver logado, exibe o conteúdo da página e coloca o e-mail no topo
                 document.body.style.display = "block";
-                userEmailSpan.textContent = user.email;
+                userEmailSpan.textContent = `Técnico Autenticado: ${user.email}`;
             } else {
-                // Se não estiver logado, redireciona imediatamente para o login
                 window.location.href = "login.html";
             }
         });
 
-        // Evento para o botão Sair
         if (btnLogout) {
             btnLogout.addEventListener("click", () => {
-                signOut(auth).then(() => {
-                    window.location.href = "login.html";
-                });
+                signOut(auth).then(() => { window.location.href = "login.html"; });
             });
+        }
+    </script>
+
+    <script>
+        // Lógica de Troca de Abas (Navegação lateral)
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.menu-links a').forEach(link => link.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('link-' + tabId).classList.add('active');
+            
+            const titles = {
+                'visao-geral': 'Painel de Gestão Técnica',
+                'assistente-ia': 'Módulo de Diagnóstico IA',
+                'chat-equipa': 'Canal de Comunicação Interno'
+            };
+            document.getElementById('tab-title').textContent = titles[tabId];
+        }
+
+        // MOTOR DO ASSISTENTE IA (Base de Conhecimento de Diagnósticos)
+        function consultarIA() {
+            const query = document.getElementById('ia-query').value.toLowerCase();
+            const responseBox = document.getElementById('ia-response');
+            
+            let htmlResult = "";
+
+            if (query.includes('rede') || query.includes('internet') || query.includes('wi-fi')) {
+                htmlResult = `
+                    <h4 style="color:var(--azul-escuro); margin-top:0;">📋 Diagnóstico Estruturado: Falha de Rede / Conectividade</h4>
+                    <p><strong>Causa Provável:</strong> Conflito de IP na subrede local ou paragem no gateway do ISP.</p>
+                    <ol>
+                        <li>Executar <code>ping 8.8.8.8</code> no terminal do terminal do cliente para testar saída externa.</li>
+                        <li>Verificar tabela ARP e renovar concessão de IP com <code>ipconfig /release</code> e <code>/renew</code>.</li>
+                        <li>Se persistir, inspecionar fisicamente o Switch de distribuição e validar se o DHCP Scope não está esgotado.</li>
+                    </ol>
+                    <p style="font-size:13px; color: green;">✔ <strong>Procedimento Padrão AB Solutions concluído.</strong></p>
+                `;
+            } else if (query.includes('lento') || query.includes('lentidão') || query.includes('desempenho')) {
+                htmlResult = `
+                    <h4 style="color:var(--azul-escuro); margin-top:0;">📋 Diagnóstico Estruturado: Degradação de Desempenho (Hardware/OS)</h4>
+                    <p><strong>Causa Provável:</strong> Elevada paginação em disco mecânico (HDD) ou processos em loop do Windows Update.</p>
+                    <ol>
+                        <li>Abrir o Gestor de Tarefas e analisar o consumo de Disco e CPU.</li>
+                        <li>Desativar serviços secundários no <code>msconfig</code> e limpar ficheiros temporários (<code>%temp%</code>).</li>
+                        <li><strong>Resolução Recomendada AB:</strong> Propor upgrade do disco de armazenamento para tecnologia SSD NVMe e expansão de RAM se < 8GB.</li>
+                    </ol>
+                `;
+            } else if (query.includes('impressora') || query.includes('impressao')) {
+                htmlResult = `
+                    <h4 style="color:var(--azul-escuro); margin-top:0;">📋 Diagnóstico Estruturado: Erro no Spooler de Impressão</h4>
+                    <p><strong>Causa Provável:</strong> Ficheiro corrompido na fila de espera bloqueando o serviço de spooler.</p>
+                    <ol>
+                        <li>Parar o serviço via cmd administrado: <code>net stop spooler</code>.</li>
+                        <li>Navegar até <code>C:\\Windows\\System32\\spool\\PRINTERS</code> e apagar todos os ficheiros contidos.</li>
+                        <li>Reiniciar o serviço com <code>net start spooler</code> e testar página de diagnóstico.</li>
+                    </ol>
+                `;
+            } else {
+                htmlResult = `
+                    <h4 style="color:#ef4444; margin-top:0;">🤖 Consulta IA</h4>
+                    <p>Não encontrei um procedimento exato para esse termo na base standard. Tenta simplificar para palavras-chave como <strong>rede</strong>, <strong>lento</strong> ou <strong>impressora</strong>, ou contacta o Diretor Técnico no Chat ao lado.</p>
+                `;
+            }
+
+            responseBox.innerHTML = htmlResult;
+            responseBox.style.display = "block";
+        }
+
+        // LÓGICA DO CHAT DA EQUIPA (Local-provisório)
+        function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            if (input.value.trim() === "") return;
+
+            const chatMessages = document.getElementById('chat-messages');
+            
+            const novaMsg = document.createElement('div');
+            novaMsg.className = "msg sent";
+            novaMsg.innerHTML = `<span class="meta">Eu (Técnico)</span>${input.value}`;
+            
+            chatMessages.appendChild(novaMsg);
+            input.value = "";
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll para baixo
         }
     </script>
 </body>
